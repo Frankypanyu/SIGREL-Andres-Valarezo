@@ -1,0 +1,75 @@
+@startuml
+' Archivo editable: abrir en PlantUML / IDE con extension UML y revisar antes de la entrega
+skinparam backgroundColor white
+skinparam classAttributeIconSize 0
+skinparam classFontSize 13
+skinparam linetype ortho
+hide empty members
+class Cliente {
+  - idCliente: int
+  - nombre: String
+  - contacto: String
+  + registrarEquipo(e: Equipo): void
+  + listarEquipos(): List<Equipo>
+}
+class Equipo {
+  - idEquipo: int
+  - numeroSerie: String
+  - marca: String
+  - modelo: String
+  + validarSerie(): boolean
+}
+class OrdenReparacion {
+  - idOrden: int
+  - fechaIngreso: LocalDate
+  - urgencia: int
+  - estado: EstadoOrden
+  - puntuacion: long
+  + calcularPrioridad(fecha: LocalDate): long
+  + cambiarEstado(nuevo: EstadoOrden): void
+}
+class Diagnostico {
+  - idDiagnostico: int
+  - descripcion: String
+  - costoEstimado: double
+  - duracionEstimadaHoras: int
+  + validarCosto(): boolean
+}
+class Tecnico {
+  - idTecnico: int
+  - nombre: String
+  - especialidades: Set<String>
+  - capacidadMax: int
+  + esCompatible(equipo: Equipo): boolean
+  + tieneCupo(): boolean
+}
+class Asignacion {
+  - idAsignacion: int
+  - fechaInicio: LocalDateTime
+  - fechaFin: LocalDateTime
+  + cerrar(): void
+}
+class EventoSeguimiento {
+  - idEvento: int
+  - fecha: LocalDateTime
+  - estadoNuevo: EstadoOrden
+  - observacion: String
+  + registrar(): void
+}
+enum EstadoOrden {
+ RECIBIDA
+ EN_DIAGNOSTICO
+ EN_REPARACION
+ LISTA
+ ENTREGADA
+ CANCELADA
+}
+Cliente "1" -- "0..*" Equipo : posee >
+Equipo "1" -- "0..*" OrdenReparacion : genera >
+OrdenReparacion "1" *-- "0..1" Diagnostico : diagnostico
+OrdenReparacion "1" *-- "0..*" EventoSeguimiento : historial
+OrdenReparacion "1" *-- "0..*" Asignacion : asignaciones
+Tecnico "1" -- "0..*" Asignacion : recibe
+OrdenReparacion --> EstadoOrden
+EventoSeguimiento --> EstadoOrden
+@enduml
